@@ -120,4 +120,43 @@ router.get('/logout', function (req, res) {
 
 
 
+router.get('/topics/new', function (req, res, next) {
+  //登陆权限设置
+  if(!req.session.user)
+  return res.redirect('/login')
+  // 返回user以动态改变header结构
+  res.render('topic/new.html',{
+    user:req.session.user
+  })
+})
+
+
+router.get('/topics/show', function (req, res, next) {
+  res.render('topic/show.html',{
+    user:req.session.user
+  })
+})
+
+
+
+router.get('/settings/profile', function (req, res, next) {
+  if(!req.session.user)
+  return res.redirect('/login')
+
+  res.render('settings/profile.html',{
+    user:req.session.user
+  })
+})
+
+router.get('/settings/admin', function (req, res, next) {
+  if(!req.session.user)
+  return res.redirect('/login')
+
+  res.render('settings/admin.html',{
+    user:req.session.user
+  })
+})
+
+
+
 module.exports = router

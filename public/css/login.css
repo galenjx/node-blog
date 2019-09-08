@@ -26,6 +26,8 @@ body {
 }
 
 .main .message {
+  display: flex;
+  justify-content: space-between;
   padding: 10px;
   padding-bottom: 0;
   border: 1px solid #d8dee2;
