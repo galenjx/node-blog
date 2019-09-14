@@ -1,7 +1,7 @@
 var express = require('express')
 var User = require('./models/user')
 var md5 = require('blueimp-md5')
-
+var fs=require('fs')
 var router = express.Router()
 
 router.get('/', function (req, res) {
@@ -143,10 +143,89 @@ router.get('/settings/profile', function (req, res, next) {
   if(!req.session.user)
   return res.redirect('/login')
 
-  res.render('settings/profile.html',{
-    user:req.session.user
+  // 2. 查询数据库用户名密码是否正确
+  // 3. 发送响应数据
+  var user = req.session.user
+  User.findOne({
+    email: user.email,
+    password: user.password
+  }, function (err, result) {
+    // console.log(result.gender)
+    if (err) {
+      // 交给处理错误的中间件
+      return next(err)
+    }
+    // 如果邮箱和密码匹配，则 user 是查询到的用户对象，否则就是 null
+    if (!result) {
+      return res.status(200).json({
+        err_code: 1,
+        message: 'Email or password is invalid.'
+      })
+    }
+
+    res.render('settings/profile.html',{
+      user:result
+    })
   })
 })
+
+
+
+router.post('/settings/profile', function (req, res, next) {
+  if(!req.session.user)
+  return res.redirect('/login')
+  //1.获取表单数据
+  //2.处理表单数据，更改修改时间
+  //3.根据id更新数据库
+  //4. 发送响应数据
+  var user = req.session.user
+  id=user._id
+  body=req.body
+  body.gender=parseInt(body.gender)
+  body.last_modified_time=Date.now()
+  // console.log(id[0])
+  User.findByIdAndUpdate(id, body, function (err) {
+    if (err) {
+      return res.status(500).send('Server error.')
+    }
+    res.status(200).json({
+      err_code: 0,
+      message: 'OK'
+    })
+    
+  })
+})
+
+
+
+
+
+
+
+  // var aimg=eq.body.avatar
+  // console.log(aimg.toString())
+  // fs.readFile(aimg.toString(), function (err, data) {
+  //   if (err) {
+  //     // return res.end(err)
+  //     console.log(err)
+  //   }
+  //   // res.end(data)
+  //   console.log(data)
+  // })
+
+
+
+
+
+
+//处理头像上传
+// router.post('/avatar', function (req, res, next) {
+//   var body=req.body;
+//   // res.send(body)
+//   console.log(body)
+// })
+
+
 
 router.get('/settings/admin', function (req, res, next) {
   if(!req.session.user)
@@ -154,6 +233,42 @@ router.get('/settings/admin', function (req, res, next) {
 
   res.render('settings/admin.html',{
     user:req.session.user
+  })
+})
+
+router.post('/settings/admin', function (req, res, next) {
+  if(!req.session.user)
+  return res.redirect('/login')
+  //1.获取表单数据
+  //2.处理表单数据，更改修改时间
+  //3.根据id更新数据库
+  //4. 发送响应数据
+  var user = req.session.user
+  body=req.body
+  if(!body.comfirmPassword||!body.currentPassword)
+  return res.status(200).json({
+    err_code: 2,
+    message: '请输入密码'
+  })
+  if(!(user.password===md5(md5(body.currentPassword)))||!(body.newPassword===body.comfirmPassword))
+  return res.status(200).json({
+    err_code: 1,
+    message: '密码或确认密码错误'
+  })
+  id=user._id
+  let newBody={}
+  newBody.password=md5(md5(body.newPassword))
+  newBody.last_modified_time=Date.now()
+  // console.log(id[0])
+  User.findByIdAndUpdate(id, newBody, function (err) {
+    if (err) {
+      return res.status(500).send('Server error.')
+    }
+    res.status(200).json({
+      err_code: 0,
+      message: 'OK'
+    })
+    
   })
 })
 

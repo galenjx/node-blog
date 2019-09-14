@@ -5,3 +5,9 @@
 .profile-avatar .avatar {
   margin-bottom: 10px;
 }
+.profile-avatar .avatar:hover{
+  cursor: pointer;
+}
+#profile-avatar{
+  display: none
+}
