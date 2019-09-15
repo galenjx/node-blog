@@ -3,30 +3,42 @@
 {{block 'title'}}{{'多人博客 - 首页'}}{{/block}}
 
 {{block 'body'}}
+
+{{block 'head'}}
+<style>
+  textarea.form-control {
+    height: auto;
+    min-height: 300px;
+}
+</style>
+{{/block}}
 <section class="container">
   <div class="row">
-    <div class="col-md-5">
-      <form>
+    <div class="col-md-9">
+      <form id="newPost_from">
         <div class="form-group">
           <label for="exampleInputEmail1">选择板块</label>
-          <select class="form-control">
-            <option>分享</option>
-            <option>问答</option>
-            <option>招聘</option>
-            <option>客户端测试</option>
+          <select class="form-control" name="category_name">
+            <option value="0">分享</option>
+            <option value="1">问答</option>
+            <option value="2">招聘</option>
+            <option value="3">客户端测试</option>
           </select>
         </div>
         <div class="form-group">
           <label for="exampleInputEmail1">标题</label>
-          <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email">
+          <input type="text" class="form-control" name="title" id="exampleInputEmail1" placeholder="title">
         </div>
         <div class="form-group">
           <label for="exampleInputPassword1">内容</label>
-          <textarea class="form-control" rows="3"></textarea>
+          <textarea class="form-control" name="content" rows="3" cols="3"></textarea>
         </div>
         <button type="submit" class="btn btn-default">Submit</button>
       </form>
     </div>
   </div>
 </section>
+{{/block}}
+{{block 'script'}}
+<script src="../../public/js/new.js"></script>
 {{/block}}

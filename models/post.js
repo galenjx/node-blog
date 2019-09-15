@@ -1,7 +1,7 @@
 var mongoose = require('mongoose')
 
 // 连接数据库
-mongoose.connect('mongodb://localhost/test', { useMongoClient: true })
+mongoose.connect('mongodb://localhost/test')
 
 var Schema = mongoose.Schema
 
@@ -10,7 +10,7 @@ var postSchema = new Schema({
     type: String,
     required: true
   },
-  category_id: {
+  category_name: {
     type: Number,
     // 0 分享
     // 1 问答

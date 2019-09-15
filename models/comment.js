@@ -1,17 +1,17 @@
 var mongoose = require('mongoose')
 
 // 连接数据库
-mongoose.connect('mongodb://localhost/test', { useMongoClient: true })
+mongoose.connect('mongodb://localhost/test')
 
 var Schema = mongoose.Schema
 
-var userSchema = new Schema({
+var commentSchema = new Schema({
   author_id: {
     type: String,
     required: true
   },
   post_id: {
-    type: NumStringber,
+    type: String,
     required: true
   },
   content: {
@@ -25,6 +25,10 @@ var userSchema = new Schema({
   parent_id: {
     type: String,
     default: ''
+  },
+  likes: {
+    type: Number,
+    default: 0
   },
 })
 

@@ -1,9 +1,16 @@
 var express = require('express')
 var User = require('./models/user')
+var Post = require('./models/post')
+var Comment = require('./models/comment')
 var md5 = require('blueimp-md5')
+var marked=require('marked')
 var fs=require('fs')
 var router = express.Router()
 
+
+
+
+//+=====================================首页===========================================
 router.get('/', function (req, res) {
   // console.log(req.session.user)
   res.render('index.html', {
@@ -13,12 +20,10 @@ router.get('/', function (req, res) {
 
 
 
-
+//+=====================================登陆===========================================
 router.get('/login', function (req, res) {
   res.render('login.html')
 })
-
-
 router.post('/login', function (req, res, next) {
   // 1. 获取表单数据
   // 2. 查询数据库用户名密码是否正确
@@ -53,11 +58,10 @@ router.post('/login', function (req, res, next) {
 
 
 
-
+//======================================注册功能=========================================
 router.get('/register', function (req, res, next) {
   res.render('register.html')
 })
-
 
 router.post('/register', function (req, res, next) {
   // 1. 获取表单提交的数据
@@ -110,6 +114,13 @@ router.post('/register', function (req, res, next) {
   })
 })
 
+
+
+
+
+
+
+//+=====================================退出登陆===========================================
 router.get('/logout', function (req, res) {
   // 清除登陆状态
   req.session.user = null
@@ -122,8 +133,8 @@ router.get('/logout', function (req, res) {
 
 
 
-
-router.get('/topics/new', function (req, res, next) {
+//+=====================================写文章===========================================
+router.get('/posts/new', function (req, res, next) {
   //登陆权限设置
   if(!req.session.user)
   return res.redirect('/login')
@@ -133,24 +144,113 @@ router.get('/topics/new', function (req, res, next) {
   })
 })
 
-
-router.post('/topics/new', function (req, res, next) {
+router.post('/posts/new', function (req, res, next) {
   //登陆权限设置
   if(!req.session.user)
   return res.redirect('/login')
+  //1.获取表单数据
+  //2.处理表单数据，更改修改时间
+  //3.根据body更新数据库
+  //4. 发送响应数据
+  var user = req.session.user
+  body=req.body
+  if(!body.category_name||!body.title||!body.content)
+  return res.status(200).json({
+    err_code: 2,
+    message: '请填写完整的文章信息'
+  })
+  body.author_id=user._id
+  console.log(body)
+  new Post(body).save(function (err, post) {
+    if (err) {
+      return next(err)
+    }
+    
+    res.status(200).json({
+      err_code: 0,
+      message: 'OK'
+    })
+
+  })
   
 })
 
 
 
-router.get('/topics/show', function (req, res, next) {
-  res.render('topic/show.html',{
-    user:req.session.user
+
+
+
+//+=====================================渲染文章，评论===========================================
+router.get('/posts/show', function (req, res, next) {
+  // res.render('topic/show.html',{
+  //   user:req.session.user
+  // })
+  // 1. 获取要渲染的文章id
+  // 
+  // 2. 渲染编辑页面
+  //    根据 id 把文章信息查出来
+  //    使用模板引擎渲染页面
+
+  //进来先清空文章的session
+  req.session.post=''
+
+  Post.findById(req.query.id, function (err, post) {
+    if (err) {
+      return next(err)
+    }
+
+    req.session.post=post
+
+    posthtml=marked(post.content)
+    res.render('topic/show.html', {
+      user:req.session.user,
+      post:posthtml
+    })
   })
 })
 
 
+router.post('/posts/comment', function (req, res, next) {
+  //登陆权限设置
+  if(!req.session.user)
+  return res.redirect('/login')
 
+  //1.获取表单数据
+  //2.处理表单数据，更改修改时间
+  //3.根据body更新数据库
+  //4. 发送响应数据
+  var post_S=req.session.post
+  var user = req.session.user
+  body=req.body
+  if(!body.content.trim())
+  return res.status(200).json({
+    err_code: 2,
+    message: '评论不能为空'
+  })
+  body.author_id=user._id
+  body.post_id=post_S._id
+  console.log(body)
+  new Comment(body).save(function (err, user) {
+    if (err) {
+      return next(err)
+    }
+    
+    res.status(200).json({
+      err_code: 0,
+      message: 'OK'
+    })
+
+  })
+  
+})
+
+
+
+
+
+
+
+//+=====================================个人信息===========================================
 router.get('/settings/profile', function (req, res, next) {
   if(!req.session.user)
   return res.redirect('/login')
@@ -181,8 +281,6 @@ router.get('/settings/profile', function (req, res, next) {
   })
 })
 
-
-
 router.post('/settings/profile', function (req, res, next) {
   if(!req.session.user)
   return res.redirect('/login')
@@ -209,11 +307,6 @@ router.post('/settings/profile', function (req, res, next) {
 })
 
 
-
-
-
-
-
   // var aimg=eq.body.avatar
   // console.log(aimg.toString())
   // fs.readFile(aimg.toString(), function (err, data) {
@@ -225,11 +318,6 @@ router.post('/settings/profile', function (req, res, next) {
   //   console.log(data)
   // })
 
-
-
-
-
-
 //处理头像上传
 // router.post('/avatar', function (req, res, next) {
 //   var body=req.body;
@@ -239,6 +327,10 @@ router.post('/settings/profile', function (req, res, next) {
 
 
 
+
+
+
+//+=====================================个人账号===========================================
 router.get('/settings/admin', function (req, res, next) {
   if(!req.session.user)
   return res.redirect('/login')
@@ -286,6 +378,11 @@ router.post('/settings/admin', function (req, res, next) {
 
 
 
+
+
+
+
+//+=====================================删除账号===========================================
 router.post('/settings/delete', function (req, res, next) {
   if(!req.session.user)
   return res.redirect('/login')
