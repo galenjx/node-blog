@@ -120,6 +120,9 @@ router.get('/logout', function (req, res) {
 
 
 
+
+
+
 router.get('/topics/new', function (req, res, next) {
   //登陆权限设置
   if(!req.session.user)
@@ -129,6 +132,15 @@ router.get('/topics/new', function (req, res, next) {
     user:req.session.user
   })
 })
+
+
+router.post('/topics/new', function (req, res, next) {
+  //登陆权限设置
+  if(!req.session.user)
+  return res.redirect('/login')
+  
+})
+
 
 
 router.get('/topics/show', function (req, res, next) {
@@ -186,7 +198,7 @@ router.post('/settings/profile', function (req, res, next) {
   // console.log(id[0])
   User.findByIdAndUpdate(id, body, function (err) {
     if (err) {
-      return res.status(500).send('Server error.')
+      return next(err)
     }
     res.status(200).json({
       err_code: 0,
@@ -262,7 +274,7 @@ router.post('/settings/admin', function (req, res, next) {
   // console.log(id[0])
   User.findByIdAndUpdate(id, newBody, function (err) {
     if (err) {
-      return res.status(500).send('Server error.')
+      return next(err)
     }
     res.status(200).json({
       err_code: 0,
@@ -273,5 +285,37 @@ router.post('/settings/admin', function (req, res, next) {
 })
 
 
+
+router.post('/settings/delete', function (req, res, next) {
+  if(!req.session.user)
+  return res.redirect('/login')
+  //1.获取表单数据
+  //2.处理表单数据，更改修改时间
+  //3.根据id更新数据库
+  //4. 发送响应数据
+  var user = req.session.user
+  body=req.body
+  if(!body.currentPassword_delete)
+  return res.status(200).json({
+    err_code: 2,
+    message: '请输入密码'
+  })
+  if(!(user.password===md5(md5(body.currentPassword_delete))))
+  return res.status(200).json({
+    err_code: 1,
+    message: '密码或确认密码错误'
+  })
+  id=user._id
+  // console.log(id[0])
+  User.findByIdAndRemove(id,function (err) {
+    if (err) {
+      return next(err)
+    }
+    res.status(200).json({
+      err_code: 0,
+      message: 'OK'
+    })
+  })
+})
 
 module.exports = router
