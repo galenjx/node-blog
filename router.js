@@ -4,7 +4,9 @@ var Post = require('./models/post')
 var Comment = require('./models/comment')
 var md5 = require('blueimp-md5')
 var marked=require('marked')
+var multer = require('multer')
 var mongoose=require('mongoose')
+var fs = require('fs')
 // var fs=require('fs')
 var router = express.Router()
 
@@ -405,26 +407,35 @@ router.post('/settings/profile', function (req, res, next) {
 })
 
 
-  // var aimg=eq.body.avatar
-  // console.log(aimg.toString())
-  // fs.readFile(aimg.toString(), function (err, data) {
-  //   if (err) {
-  //     // return res.end(err)
-  //     console.log(err)
-  //   }
-  //   // res.end(data)
-  //   console.log(data)
-  // })
+//处理头像上传问题
+var datatime = './public/img'
+var storage = multer.diskStorage({
+    // 如果你提供的 destination 是一个函数，你需要负责创建文件夹
+    destination: datatime,
+    //给上传文件重命名，获取添加后缀名
+    filename: function (req, file, cb) {
+        cb(null,  Date.now()+file.originalname);
+     }
+}); 
+var upload = multer({
+    storage: storage
+});
 
-//处理头像上传
-// router.post('/avatar', function (req, res, next) {
-//   var body=req.body;
-//   // res.send(body)
-//   console.log(body)
-// })
-
-
-
+router.post('/avatar',upload.single('avatar'),function(req,res,next){
+    console.log(req.file.path)//req.file文件的具体信息
+    // res.send({ret_code: datatime});
+    user = req.session.user
+    var id = user._id
+    var newAvatar = {}
+    newAvatar.avatar = '\\'+req.file.path
+    newAvatar.last_modified_time = Date.now()
+    User.findByIdAndUpdate(id, newAvatar, function (err) {
+    if (err) {
+      return next(err)
+    }
+    res.redirect('/settings/profile')
+  })
+});
 
 
 

@@ -3,25 +3,32 @@
 {{block 'title'}}{{'多人博客 - 首页'}}{{/block}}
 {{block 'head'}}
 <link rel="stylesheet" href="../../public/css/settings.css">
+<style>
+.hidden {
+  display: none
+}
+</style>
 {{/block}}
 {{block 'body'}}
 <section class="container">
   {{include '../_partials/settings-nav.html'}}
   <div class="col-md-5">
+    <form id="upDateAvatar_from" method="post" action="/avatar" enctype="multipart/form-data">
+      <div class="profile-avatar">
+          <dl>
+            <dt>头像设置</dt>
+            <dd>
+              <label for="profile-avatar">
+              <img class="avatar" width="150" height="150" src="..{{ user.avatar }}" alt="">
+              <input type="file" id="profile-avatar" name="avatar">
+              <!-- <input type="hidden" name="avatar" id=""> -->
+            </label>
+            </dd>
+          </dl>
+        </div>
+      <button type="submit" class="hidden">保存</button>
+    </form>
     <form id="upDateProfit_from">
-        <div class="profile-avatar">
-            <dl>
-              <dt>头像设置</dt>
-              <dd>
-                <label for="profile-avatar">
-                
-                <img class="avatar" width="150" height="150" src="..{{user.avatar}}" alt="">
-                <input type="file" id="profile-avatar" name="">
-                <!-- <input type="hidden" name="avatar" id=""> -->
-              </label>
-              </dd>
-            </dl>
-          </div>
       <div class="form-group">
         <label for="exampleInputEmail1">账号</label>
         <p class="form-control-static">{{user.email}}</p>
