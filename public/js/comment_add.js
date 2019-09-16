@@ -11,9 +11,8 @@ $('#comment_posts').on('submit', function (e) {
         var err_code = data.err_code
         if (err_code === 0) {
           window.alert('发表评论成功！！')
-          //插入一条评论
 
-
+          location.reload()
         }else if (err_code === 2) {
             window.alert(data.message)
         }else if (err_code === 500) {

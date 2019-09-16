@@ -7,11 +7,15 @@ var Schema = mongoose.Schema
 
 var commentSchema = new Schema({
   author_id: {
+    type: Schema.Types.ObjectId,
+    required: true
+  },
+  author_nickname: {
     type: String,
     required: true
   },
   post_id: {
-    type: String,
+    type: Schema.Types.ObjectId,
     required: true
   },
   content: {

@@ -7,7 +7,7 @@ var Schema = mongoose.Schema
 
 var postSchema = new Schema({
   author_id: {
-    type: String,
+    type: Schema.Types.ObjectId,
     required: true
   },
   category_name: {
