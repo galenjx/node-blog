@@ -45,13 +45,13 @@
         <label for="exampleInputPassword1">性别</label>
         <div>
           <label class="radio-inline">
-            <input type="radio" id="inlineRadio1" name="gender" value="1" checked="{{user.gender==1?'checked':''}}"> 男
+            <input type="radio" id="inlineRadio1" name="gender" value="1" {{ user.gender == 1 ? 'checked' : ''}}> 男
           </label>
           <label class="radio-inline">
-            <input type="radio" id="inlineRadio2" name="gender" value="0" checked="{{user.gender==0?'checked':''}}"> 女
+            <input type="radio" id="inlineRadio2" name="gender" value="0" {{ user.gender == 0 ? 'checked' : ''}}> 女
           </label>
           <label class="radio-inline">
-            <input type="radio" id="inlineRadio3" name="gender" value="-1" checked="{{user.gender==-1?'checked':''}}"> 保密
+            <input type="radio" id="inlineRadio3" name="gender" value="-1" {{ user.gender == -1 ? 'checked' : ''}}"> 保密
           </label>
         </div>
       </div>

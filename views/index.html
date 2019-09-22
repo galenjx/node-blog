@@ -24,7 +24,7 @@
       </div>
       <div class="media-body">
         <h4 class="media-heading"><a href="/posts/show?id={{ $value._id }}">{{ $value.title }}</a></h4>
-        <p>{{ $value.likes }} 人关注 • {{ $value.comment_detail.length }} 个回复 • {{ $value.views }} 次浏览 • 更新于{{ $value.last_modified_time }}</p>
+        <p>{{ $value.likes }} 人喜欢 • {{ $value.comment_detail.length }} 个回复 • 更新于{{ $value.last_modified_time }}</p>
       </div>
     </li>
     {{ /each }}

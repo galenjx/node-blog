@@ -1,0 +1,55 @@
+{{extend '../_layouts/home.html'}}
+
+{{block 'title'}}{{'多人博客 - 首页'}}{{/block}}
+
+{{block 'body'}}
+{{block 'head'}}
+<link rel="stylesheet" href="../../public/css/settings.css">
+<style>
+    .panel-heading {
+    border-bottom: none;
+    }
+</style>
+{{/block}}
+<section class="container">
+    {{include '../_partials/settings-nav.html'}}
+
+    <div class="col-md-7">
+    {{ each result }}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <a href="/topic/edit?id={{ $value._id }}"> {{ $value.title }} </a>
+        </div>
+    </div>
+    {{ /each }}
+
+
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            <li>
+                <a href="#" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li class="active"><a href="#">1</a></li>
+            <li><a href="#">2</a></li>
+            <li><a href="#">3</a></li>
+            <li><a href="#">4</a></li>
+            <li><a href="#">5</a></li>
+            <li>
+                <a href="#" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+</section>
+{{/block}}
+{{block 'script'}}
+<script>
+$(function () {
+  $('#post_setting_id').addClass('active').siblings().removeClass('active')
+})
+</script>
+{{/block}}

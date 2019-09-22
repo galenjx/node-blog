@@ -3,9 +3,10 @@ var User = require('./models/user')
 var Post = require('./models/post')
 var Comment = require('./models/comment')
 var md5 = require('blueimp-md5')
-var marked=require('marked')
+var marked = require('marked')
 var multer = require('multer')
-var mongoose=require('mongoose')
+var mongoose = require('mongoose')
+var formatDate = require('./public/js/formatDate')
 var fs = require('fs')
 // var fs=require('fs')
 var router = express.Router()
@@ -33,22 +34,26 @@ router.get('/', function (req, res) {
         as: "comment_detail"
       }
     }
-  ],function(err,result){
+  ], function (err, result) {
     if (err) {
       // 交给处理错误的中间件
       return next(err)
     }
+    result.forEach(element => {
+      element.last_modified_time=formatDate(element.last_modified_time)
+    });
+    // console.log(result)
     res.render('index.html', {
       user: req.session.user,
       lists: result
     })
   })
-  .sort({_id:-1})
-  .limit(20)
+    .sort({ _id: -1 })
+    .limit(20)
 
 
 
-  
+
 })
 
 
@@ -80,7 +85,7 @@ router.post('/login', function (req, res, next) {
     }
     // 用户存在，登陆成功，通过 Session 记录登陆状态
     req.session.user = user
-    
+
     res.status(200).json({
       err_code: 0,
       message: 'OK'
@@ -107,11 +112,11 @@ router.post('/register', function (req, res, next) {
   var body = req.body
   User.findOne({
     $or: [{
-        email: body.email
-      },
-      {
-        nickname: body.nickname
-      }
+      email: body.email
+    },
+    {
+      nickname: body.nickname
+    }
     ]
   }, function (err, data) {
     if (err) {
@@ -169,46 +174,131 @@ router.get('/logout', function (req, res) {
 //+=====================================写文章===========================================
 router.get('/posts/new', function (req, res, next) {
   //登陆权限设置
-  if(!req.session.user)
-  return res.redirect('/login')
+  if (!req.session.user)
+    return res.redirect('/login')
   // 返回user以动态改变header结构
-  res.render('topic/new.html',{
-    user:req.session.user
+  res.render('topic/new.html', {
+    user: req.session.user
   })
 })
 
 router.post('/posts/new', function (req, res, next) {
   //登陆权限设置
-  if(!req.session.user)
-  return res.redirect('/login')
+  if (!req.session.user)
+    return res.redirect('/login')
   //1.获取表单数据
   //2.处理表单数据，更改修改时间
   //3.根据body更新数据库
   //4. 发送响应数据
   var user = req.session.user
-  body=req.body
-  if(!body.category_name||!body.title||!body.content)
-  return res.status(200).json({
-    err_code: 2,
-    message: '请填写完整的文章信息'
-  })
-  body.author_id=user._id
+  body = req.body
+  if (!body.category_name || !body.title || !body.content)
+    return res.status(200).json({
+      err_code: 2,
+      message: '请填写完整的文章信息'
+    })
+  body.author_id = user._id
   // console.log(body)
   new Post(body).save(function (err, post) {
     if (err) {
       return next(err)
     }
-    
+
     res.status(200).json({
       err_code: 0,
       message: 'OK'
     })
 
   })
-  
+
 })
 
 
+
+
+//=========================================编辑文章=============================================
+//渲染私人文章列表
+router.get('/settings/edit_post_list', function (req, res, next) {
+  //登陆权限设置
+  if (!req.session.user)
+    return res.redirect('/login')
+  // 返回user以动态改变header结构
+
+
+  var user = req.session.user
+  Post.find({
+    author_id: user._id
+  }, function (err, result) {
+    if (err) {
+      // 交给处理错误的中间件
+      return next(err)
+    }
+    res.render('topic/post_list.html', {
+      user: req.session.user,
+      result: result
+    })
+  })
+
+})
+
+
+//编辑文章
+router.get('/topic/edit', function (req, res, next) {
+  //登陆权限设置
+  if (!req.session.user)
+    return res.redirect('/login')
+
+    
+  var id = req.query.id.replace(/"/g, '')
+  Oid = mongoose.Types.ObjectId(id);
+  Post.findOne({
+    _id: Oid
+  }, function (err, result) {
+    if (err) {
+      // 交给处理错误的中间件
+      return next(err)
+    }
+    res.render('topic/edit.html', {
+      user: req.session.user,
+      result: result
+    })
+  })
+})
+
+
+//更改文章
+router.post('/topic/edit', function (req, res, next) {
+  if (!req.session.user)
+  return res.redirect('/login')
+  //1.获取表单数据
+  //2.处理表单数据，更改修改时间
+  //3.根据id更新数据库
+  //4. 发送响应数据
+  var user = req.session.user
+  body = req.body
+
+  var id = body.id.replace(/"/g, '')
+  Oid = mongoose.Types.ObjectId(id);
+  body.last_modified_time = Date.now()
+
+  Post.findOneAndUpdate(
+    { _id: Oid, 
+      author_id: user._id 
+    }, 
+    {
+      $set :body
+    }, 
+    function (err) {
+    if (err) {
+      return next(err)
+    }
+    res.status(200).json({
+      err_code: 0,
+      message: 'OK'
+    })
+
+  })
+})
 
 
 
@@ -227,24 +317,24 @@ router.get('/posts/show', function (req, res, next) {
 
 
   //views+1
-    // var newPost=null
-    // newPost.views = result[0].views + 1
-    // new Post(newPost).save(function (err, user) {
-    //   if (err) {
-    //     return next(err)
-    //   }
-      
-    //   res.status(200).json({
-    //     err_code: 0,
-    //     message: 'OK'
-    //   })
-  
-    // })
+  // var newPost=null
+  // newPost.views = result[0].views + 1
+  // new Post(newPost).save(function (err, user) {
+  //   if (err) {
+  //     return next(err)
+  //   }
+
+  //   res.status(200).json({
+  //     err_code: 0,
+  //     message: 'OK'
+  //   })
+
+  // })
 
 
 
-  req.session.post=''
-  var id = req.query.id.replace(/"/g,'')
+  req.session.post = ''
+  var id = req.query.id.replace(/"/g, '')
   Oid = mongoose.Types.ObjectId(id);
   // console.log(Oid)
   Post.aggregate([
@@ -265,20 +355,22 @@ router.get('/posts/show', function (req, res, next) {
       }
     },
     {
-       $match : { _id : { $eq : Oid }}
-     }
-  ],function(err,result){
+      $match: { _id: { $eq: Oid } }
+    }
+  ], function (err, result) {
     if (err) {
       // 交给处理错误的中间件
       return next(err)
     }
-    req.session.post=result[0]
+    req.session.post = result[0]
     // console.log(result[0].content)
-    result[0].content=marked(result[0].content)
+    result[0].content = marked(result[0].content)
+
+    result[0].comment_detail.forEach(element =>{
+      element.created_time = formatDate(element.created_time)
+    })
 
 
-
-    // console.log(result[0])
     res.render('topic/show.html', {
       user: req.session.user,
       result: result[0],
@@ -311,37 +403,37 @@ router.get('/posts/show', function (req, res, next) {
 
 router.post('/posts/comment', function (req, res, next) {
   //登陆权限设置
-  if(!req.session.user)
-  return res.redirect('/login')
+  if (!req.session.user)
+    return res.redirect('/login')
 
   //1.获取表单数据
   //2.处理表单数据，更改修改时间
   //3.根据body更新数据库
   //4. 发送响应数据
-  var post_S=req.session.post
+  var post_S = req.session.post
   var user = req.session.user
-  body=req.body
-  if(!body.content.trim())
-  return res.status(200).json({
-    err_code: 2,
-    message: '评论不能为空'
-  })
-  body.author_id=user._id
-  body.author_nickname=user.nickname
-  body.post_id=post_S._id
+  body = req.body
+  if (!body.content.trim())
+    return res.status(200).json({
+      err_code: 2,
+      message: '评论不能为空'
+    })
+  body.author_id = user._id
+  body.author_nickname = user.nickname
+  body.post_id = post_S._id
   // console.log(body)
   new Comment(body).save(function (err, user) {
     if (err) {
       return next(err)
     }
-    
+
     res.status(200).json({
       err_code: 0,
       message: 'OK'
     })
 
   })
-  
+
 })
 
 
@@ -352,8 +444,8 @@ router.post('/posts/comment', function (req, res, next) {
 
 //+=====================================个人信息===========================================
 router.get('/settings/profile', function (req, res, next) {
-  if(!req.session.user)
-  return res.redirect('/login')
+  if (!req.session.user)
+    return res.redirect('/login')
 
   // 2. 查询数据库用户名密码是否正确
   // 3. 发送响应数据
@@ -375,24 +467,24 @@ router.get('/settings/profile', function (req, res, next) {
       })
     }
 
-    res.render('settings/profile.html',{
-      user:result
+    res.render('settings/profile.html', {
+      user: result
     })
   })
 })
 
 router.post('/settings/profile', function (req, res, next) {
-  if(!req.session.user)
-  return res.redirect('/login')
+  if (!req.session.user)
+    return res.redirect('/login')
   //1.获取表单数据
   //2.处理表单数据，更改修改时间
   //3.根据id更新数据库
   //4. 发送响应数据
   var user = req.session.user
-  id=user._id
-  body=req.body
-  body.gender=parseInt(body.gender)
-  body.last_modified_time=Date.now()
+  id = user._id
+  body = req.body
+  body.gender = parseInt(body.gender)
+  body.last_modified_time = Date.now()
   // console.log(id[0])
   User.findByIdAndUpdate(id, body, function (err) {
     if (err) {
@@ -402,7 +494,7 @@ router.post('/settings/profile', function (req, res, next) {
       err_code: 0,
       message: 'OK'
     })
-    
+
   })
 })
 
@@ -410,26 +502,26 @@ router.post('/settings/profile', function (req, res, next) {
 //处理头像上传问题
 var datatime = './public/img'
 var storage = multer.diskStorage({
-    // 如果你提供的 destination 是一个函数，你需要负责创建文件夹
-    destination: datatime,
-    //给上传文件重命名，获取添加后缀名
-    filename: function (req, file, cb) {
-        cb(null,  Date.now()+file.originalname);
-     }
-}); 
+  // 如果你提供的 destination 是一个函数，你需要负责创建文件夹
+  destination: datatime,
+  //给上传文件重命名，获取添加后缀名
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + file.originalname);
+  }
+});
 var upload = multer({
-    storage: storage
+  storage: storage
 });
 
-router.post('/avatar',upload.single('avatar'),function(req,res,next){
-    console.log(req.file.path)//req.file文件的具体信息
-    // res.send({ret_code: datatime});
-    user = req.session.user
-    var id = user._id
-    var newAvatar = {}
-    newAvatar.avatar = '\\'+req.file.path
-    newAvatar.last_modified_time = Date.now()
-    User.findByIdAndUpdate(id, newAvatar, function (err) {
+router.post('/avatar', upload.single('avatar'), function (req, res, next) {
+  console.log(req.file.path)//req.file文件的具体信息
+  // res.send({ret_code: datatime});
+  user = req.session.user
+  var id = user._id
+  var newAvatar = {}
+  newAvatar.avatar = '\\' + req.file.path
+  newAvatar.last_modified_time = Date.now()
+  User.findByIdAndUpdate(id, newAvatar, function (err) {
     if (err) {
       return next(err)
     }
@@ -441,37 +533,37 @@ router.post('/avatar',upload.single('avatar'),function(req,res,next){
 
 //+=====================================个人账号===========================================
 router.get('/settings/admin', function (req, res, next) {
-  if(!req.session.user)
-  return res.redirect('/login')
+  if (!req.session.user)
+    return res.redirect('/login')
 
-  res.render('settings/admin.html',{
-    user:req.session.user
+  res.render('settings/admin.html', {
+    user: req.session.user
   })
 })
 
 router.post('/settings/admin', function (req, res, next) {
-  if(!req.session.user)
-  return res.redirect('/login')
+  if (!req.session.user)
+    return res.redirect('/login')
   //1.获取表单数据
   //2.处理表单数据，更改修改时间
   //3.根据id更新数据库
   //4. 发送响应数据
   var user = req.session.user
-  body=req.body
-  if(!body.comfirmPassword||!body.currentPassword)
-  return res.status(200).json({
-    err_code: 2,
-    message: '请输入密码'
-  })
-  if(!(user.password===md5(md5(body.currentPassword)))||!(body.newPassword===body.comfirmPassword))
-  return res.status(200).json({
-    err_code: 1,
-    message: '密码或确认密码错误'
-  })
-  id=user._id
-  let newBody={}
-  newBody.password=md5(md5(body.newPassword))
-  newBody.last_modified_time=Date.now()
+  body = req.body
+  if (!body.comfirmPassword || !body.currentPassword)
+    return res.status(200).json({
+      err_code: 2,
+      message: '请输入密码'
+    })
+  if (!(user.password === md5(md5(body.currentPassword))) || !(body.newPassword === body.comfirmPassword))
+    return res.status(200).json({
+      err_code: 1,
+      message: '密码或确认密码错误'
+    })
+  id = user._id
+  let newBody = {}
+  newBody.password = md5(md5(body.newPassword))
+  newBody.last_modified_time = Date.now()
   // console.log(id[0])
   User.findByIdAndUpdate(id, newBody, function (err) {
     if (err) {
@@ -481,7 +573,7 @@ router.post('/settings/admin', function (req, res, next) {
       err_code: 0,
       message: 'OK'
     })
-    
+
   })
 })
 
@@ -493,27 +585,27 @@ router.post('/settings/admin', function (req, res, next) {
 
 //+=====================================删除账号===========================================
 router.post('/settings/delete', function (req, res, next) {
-  if(!req.session.user)
-  return res.redirect('/login')
+  if (!req.session.user)
+    return res.redirect('/login')
   //1.获取表单数据
   //2.处理表单数据，更改修改时间
   //3.根据id更新数据库
   //4. 发送响应数据
   var user = req.session.user
-  body=req.body
-  if(!body.currentPassword_delete)
-  return res.status(200).json({
-    err_code: 2,
-    message: '请输入密码'
-  })
-  if(!(user.password===md5(md5(body.currentPassword_delete))))
-  return res.status(200).json({
-    err_code: 1,
-    message: '密码或确认密码错误'
-  })
-  id=user._id
+  body = req.body
+  if (!body.currentPassword_delete)
+    return res.status(200).json({
+      err_code: 2,
+      message: '请输入密码'
+    })
+  if (!(user.password === md5(md5(body.currentPassword_delete))))
+    return res.status(200).json({
+      err_code: 1,
+      message: '密码或确认密码错误'
+    })
+  id = user._id
   // console.log(id[0])
-  User.findByIdAndRemove(id,function (err) {
+  User.findByIdAndRemove(id, function (err) {
     if (err) {
       return next(err)
     }

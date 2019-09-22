@@ -52,26 +52,31 @@ mongodb : `4.2.2`
 
 没有特殊说明，都是利用session
 
-| 路径              | 方法 | get参数 | post参数                                | 是否需要登陆 | 备注                 | 完成状态 |
-| :---------------- | ---- | ------- | --------------------------------------- | ------------ | -------------------- | -------- |
-| /                 | get  |         |                                         |              | 渲染首页             | ✔        |
-| /register         | get  |         |                                         |              | 渲染注册页           | ✔        |
-| /register         | post |         | email，nickname，password               |              | 处理注册请求         | ✔        |
-| /login            | get  |         |                                         |              | 渲染登陆页           | ✔        |
-| /login            | post |         | email,password                          |              | 处理登陆请求         | ✔        |
-| /logout           | get  |         |                                         |              | 处理退出请求         | ✔        |
-| /settings/profile | get  |         |                                         | y            | 渲染个人信息页面     | ✔        |
-| /settings/profile | post |         |                                         | y            | 处理更改个人信息请求 | ✔        |
-| /settings/admin   | get  |         |                                         | y            | 渲染设置页面         | ✔        |
-| /settings/admin   | post |         |                                         | y            | 处理设置请求         | ✔        |
-| /topics/show      | get  | post_id |                                         |              | 渲染文章详情页面     | ✔        |
-| /topics/new       | get  |         |                                         | y            | 渲染写文章页面       | ✔        |
-| /topics/new       | post |         | email/user_id，category，title，content | y            | 处理发表文章请求     | ✔        |
-| /topics/comments  | post |         | email/user_id,post_id,content           | y            | 处理评论请求         | ✔        |
+| 路径                     | 方法 | get参数 | post参数                                | 是否需要登陆 | 备注                 | 完成状态 |
+| :----------------------- | ---- | ------- | --------------------------------------- | ------------ | -------------------- | -------- |
+| /                        | get  |         |                                         |              | 渲染首页             | ✔        |
+| /register                | get  |         |                                         |              | 渲染注册页           | ✔        |
+| /register                | post |         | email，nickname，password               |              | 处理注册请求         | ✔        |
+| /login                   | get  |         |                                         |              | 渲染登陆页           | ✔        |
+| /login                   | post |         | email,password                          |              | 处理登陆请求         | ✔        |
+| /logout                  | get  |         |                                         |              | 处理退出请求         | ✔        |
+| /settings/profile        | get  |         |                                         | y            | 渲染个人信息页面     | ✔        |
+| /settings/profile        | post |         |                                         | y            | 处理更改个人信息请求 | ✔        |
+| /settings/admin          | get  |         |                                         | y            | 渲染设置页面         | ✔        |
+| /settings/admin          | post |         |                                         | y            | 处理设置请求         | ✔        |
+| /topics/show             | get  | post_id |                                         |              | 渲染文章详情页面     | ✔        |
+| /topics/new              | get  |         |                                         | y            | 渲染写文章页面       | ✔        |
+| /topics/new              | post |         | email/user_id，category，title，content | y            | 处理发表文章请求     | ✔        |
+| /topics/comments         | post |         | email/user_id,post_id,content           | y            | 处理评论请求         | ✔        |
+| /settings/edit_post_list | get  |         |                                         | y            | 渲染个人文章列表     | ✔        |
+| /topic/edit              | get  |         | post._id                                | y            | 渲染编辑文章页       | ✔        |
+| /topic/edit              | post |         | user_id，category，title，content       | y            | 处理编辑请求         | ✔        |
 
 ### 待完成的功能
 
-个人文章的管理，回复评论，还有想到再写......
+最近刷题去了，有空就更。
+
+文章，评论点赞，文章的状态，回复评论，个人对他人可见的主页等，还有想到再写......
 
 ### 遇到过困难的点
 
@@ -81,6 +86,8 @@ mongodb : `4.2.2`
 
 2. marked语法不够熟悉，以为文章解析出bug
 
-3. 联合查询
+3. 联合查询，两个对于困扰我比较久的点：_id的数据类型，通过url传id时id会有双引号。
 
-   两个对于困扰我比较久的点：_id的数据类型，通过url传id时id会有双引号。
+4. 更改文章的安全性问题，利用session判断修改者是不是原作者
+
+   

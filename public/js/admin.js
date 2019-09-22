@@ -51,8 +51,7 @@ $('#upDateAdmin_from').on('submit', function (e) {
   })
 
 
-  $(function(){
-    $('#admin_setting_id').addClass('active')
-    $('#profit_setting_id').removeClass('active')
-})
+  $(function () {
+    $('#admin_setting_id').addClass('active').siblings().removeClass('active')
+  })
 
