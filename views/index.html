@@ -13,9 +13,9 @@
 </style>
 {{/block}}
 <section class="container">
-
+    {{ if finalData }}
   <ul class="media-list">
-      {{ each lists }}
+      {{ each finalData.lists }}
     <li class="media">
       <div class="media-left">
         <a href="#">
@@ -33,22 +33,26 @@
   <nav aria-label="Page navigation">
     <ul class="pagination">
       <li>
-        <a href="#" aria-label="Previous">
+        <a href="/?page={{ finalData.pageControl.page - 1 }}" aria-label="Previous">
         <span aria-hidden="true">&laquo;</span>
       </a>
       </li>
-      <li class="active"><a href="#">1</a></li>
-      <li><a href="#">2</a></li>
-      <li><a href="#">3</a></li>
-      <li><a href="#">4</a></li>
-      <li><a href="#">5</a></li>
+
+      {{ each finalData.pageControl.pageControlLists }}
+      <li {{ $value == finalData.pageControl.page ? 'class=active' : '' }}><a href="/?page={{ $value }}">{{ $value }}</a></li>
+      {{ /each }}
       <li>
-        <a href="#" aria-label="Next">
+        <a href="/?page={{ finalData.pageControl.page + 1 }}" aria-label="Next">
         <span aria-hidden="true">&raquo;</span>
       </a>
       </li>
     </ul>
   </nav>
-
+  {{ else if message }}
+  <div class="col-md-7" style="height: 500px;width: 500px;padding: 50px;font-size: 30px;">
+         <p>暂时没有文章哦！</p>
+         <a href="/posts/new">开始我的写作</a>
+  </div>
+  {{ /if }}
 </section>
 {{/block}}

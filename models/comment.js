@@ -1,7 +1,7 @@
 var mongoose = require('mongoose')
 
 // 连接数据库
-mongoose.connect('mongodb://localhost/test')
+mongoose.connect('mongodb://localhost/test',{ useNewUrlParser: true,useUnifiedTopology: true })
 
 var Schema = mongoose.Schema
 

@@ -7,49 +7,59 @@
 <link rel="stylesheet" href="../../public/css/settings.css">
 <style>
     .panel-heading {
-    border-bottom: none;
+        border-bottom: none;
+    }
+    .post_container {
+    min-height: 500px
     }
 </style>
 {{/block}}
+
 <section class="container">
     {{include '../_partials/settings-nav.html'}}
-
+    {{ if finalData }}
     <div class="col-md-7">
-    {{ each result }}
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <a href="/topic/edit?id={{ $value._id }}"> {{ $value.title }} </a>
+        <div class="post_container">
+            {{ each finalData.lists }}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <a href="/topic/edit?id={{ $value._id }}"> {{ $value.title }} </a>
+                </div>
+            </div>
+            {{ /each }}
         </div>
+
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <li>
+                    <a href="/settings/edit_post_list?page={{ finalData.pageControl.page - 1 }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {{ each finalData.pageControl.pageControlLists }}
+                <li {{ $value == finalData.pageControl.page ? 'class=active' : '' }}><a href="/settings/edit_post_list?page={{ $value }}">{{ $value }}</a></li>
+                {{ /each }}
+                <li>
+                    <a href="/settings/edit_post_list?page={{ finalData.pageControl.page - 1 }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
     </div>
-    {{ /each }}
-
-
-    <nav aria-label="Page navigation">
-        <ul class="pagination">
-            <li>
-                <a href="#" aria-label="Previous">
-                    <span aria-hidden="true">&laquo;</span>
-                </a>
-            </li>
-            <li class="active"><a href="#">1</a></li>
-            <li><a href="#">2</a></li>
-            <li><a href="#">3</a></li>
-            <li><a href="#">4</a></li>
-            <li><a href="#">5</a></li>
-            <li>
-                <a href="#" aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                </a>
-            </li>
-        </ul>
-    </nav>
-</div>
+    {{ else if message }}
+    <div class="col-md-7" style="height: 500px;width: 500px;padding: 50px;font-size: 30px;">
+           <p>您暂时没有文章哦！</p>
+           <a href="/posts/new">开始我的写作</a>
+    </div>
+    {{ /if }}
 </section>
+
 {{/block}}
 {{block 'script'}}
 <script>
-$(function () {
-  $('#post_setting_id').addClass('active').siblings().removeClass('active')
-})
+    $(function () {
+        $('#post_setting_id').addClass('active').siblings().removeClass('active')
+    })
 </script>
 {{/block}}

@@ -16,6 +16,10 @@
   <div class="row">
     <div class="col-md-9">
       <form id="editPost_from">
+          <div class="subhead">
+              <h2>编辑文章</h2>
+            </div>
+            <hr>
         <div class="form-group">
           <label for="exampleInputEmail1">选择板块</label>
           <select class="form-control" name="category_name">
@@ -35,6 +39,13 @@
           <textarea class="form-control" name="content" rows="3" cols="3">{{ result.content }}</textarea>
         </div>
         <button type="submit" class="btn btn-success">Submit</button>
+        <hr>
+        <div class="subhead">
+            <h2>删除文章</h2>
+          </div>
+          <hr>
+          <p>一旦注销，不可找回，请谨慎操作</p>
+        <a href="/posts_delete_post?id={{ result._id }}" class="btn btn-danger">删除</a>
       </form>
     </div>
   </div>

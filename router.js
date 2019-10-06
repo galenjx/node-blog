@@ -38,6 +38,8 @@ router.get('/settings/edit_post_list', require('./routes/edit_post_list_get'))
 router.get('/topic/edit', require('./routes/topic_post_edit_get'))
 //更改文章
 router.post('/topic/edit', require('./routes/topic_post_edit_post'))
+//删除私人文章
+router.get('/posts_delete_post', require('./routes/posts_delete_post'))
 //+=====================================渲染文章，评论===========================================
 router.get('/posts/show', require('./routes/post_comment_get'))
 
