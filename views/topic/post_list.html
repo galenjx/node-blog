@@ -58,8 +58,12 @@
 {{/block}}
 {{block 'script'}}
 <script>
-    $(function () {
-        $('#post_setting_id').addClass('active').siblings().removeClass('active')
-    })
+
+var currentPathname = window.location.pathname
+//相应的分类高亮
+$(function () {
+  $("#setting_class a[href^='" + currentPathname + "']").addClass('active').siblings().removeClass('active')
+})
+
 </script>
 {{/block}}

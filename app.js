@@ -1,10 +1,10 @@
-var express = require('express')
-var path = require('path')
-var bodyParser = require('body-parser')
-var session = require('express-session')
-var router = require('./router')
+const express = require('express')
+const path = require('path')
+const bodyParser = require('body-parser')
+const session = require('express-session')
+const router = require('./router')
 
-var app = express()
+const app = express()
 
 app.use('/public/', express.static(path.join(__dirname, './public/')))
 app.use('/node_modules/', express.static(path.join(__dirname, './node_modules/')))
