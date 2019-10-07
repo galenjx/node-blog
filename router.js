@@ -55,6 +55,8 @@ router.get('/posts_delete_post', personal_post.posts_delete_post)
 
 router.post('/posts/comment', comments_handle.post_comment_post)
 
+// router.get('/posts/comment_likes', comments_handle.comment_likes_get)
+
 //+=====================================personal_message_settings===========================================
 router.get('/settings/profile', personal_message_settings.settings_profile_get)
 

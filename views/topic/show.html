@@ -12,6 +12,9 @@
     min-height: 400px;
     margin-bottom: 50px;
 }
+.red{
+  color: red
+}
 </style>
 {{/block}}
 
@@ -28,8 +31,8 @@
           <span>{{ $value.author_nickname }}</span> commented 
           <span>{{ $value.created_time }}</span>
           <span class="action">
-            <span class="pull-right">0</span>
-            <a href=""><i class="glyphicon glyphicon-thumbs-up pull-right" style="vertical-align: middle"></i></a>
+            <span id="likes_number" class="pull-right"></span>
+            <a id="likes" href="/posts/comment_likes?id={{$value._id}}"><i class="glyphicon glyphicon-thumbs-up pull-right" class="blue" style="vertical-align: middle"></i></a>
             <!-- <a href=""><i class="glyphicon glyphicon-remove-circle pull-right"></i></a>
             <a href=""><i class="glyphicon glyphicon-remove-circle pull-right"></i></a> -->
           </span>
@@ -49,6 +52,9 @@
         </div>
         <button type="submit" class="btn btn-success">回复</button>
       </form>
+      {{ else }}
+      <h3><a href="/login">登陆查看更多功能...</a></h3>
+      <hr>
       {{ /if }}
     </div>
   </div>
@@ -56,5 +62,5 @@
 {{/block}}
 {{block 'script'}}
 <script src="../../public/js/post_ajax.js"></script>
-<script src="../../public/js/comment_add.js"></script>
+<script src="../../public/js/commentHandle.js"></script>
 {{/block}}

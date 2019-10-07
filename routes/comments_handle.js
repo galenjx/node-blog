@@ -32,6 +32,16 @@ const post_comment_post = function (req, res, next) {
     })
 }
 
+
+// const comment_likes_get = function(req, res, next){
+    
+//     let id = req.query.id.replace(/"/g, '')
+//     let Oid = mongoose.Types.ObjectId(id);
+    
+// }
+
+
+
 module.exports = {
     post_comment_post
 }

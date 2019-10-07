@@ -105,32 +105,13 @@ const indexPage_get = function (req, res, next) {
 
 
 const post_comment_show_get = function (req, res, next) {
-    // res.render('topic/show.html',{
-    //   user:req.session.user
-    // })
-    // 1. 获取要渲染的文章id
-    // 
-    // 2. 渲染编辑页面
-    //    根据 id 把文章信息,评论内容查出来，
-    //    =======注意获取的id有双引号，而且查询时id类型要为ObjectId，这个问题困住我一大个早上==============
-    //    使用模板引擎渲染页面
-    //views+1
-    // let newPost=null
-    // newPost.views = result[0].views + 1
-    // new Post(newPost).save(function (err, user) {
-    //   if (err) {
-    //     return next(err)
-    //   }
-    //   res.status(200).json({
-    //     err_code: 0,
-    //     message: 'OK'
-    //   })
-    // })
 
     req.session.post = ''
+    let finResult = {}
     let id = req.query.id.replace(/"/g, '')
     let Oid = mongoose.Types.ObjectId(id);
     // console.log(Oid)
+
     Post.aggregate([
         {
             $lookup: {
@@ -151,11 +132,8 @@ const post_comment_show_get = function (req, res, next) {
         {
             $match: { _id: { $eq: Oid } }
         }
-    ], function (err, result) {
-        if (err) {
-            // 交给处理错误的中间件
-            return next(err)
-        }
+    ])
+    .then(function (result) {
         req.session.post = result[0]._id
         // console.log(result[0].content)
         result[0].content = marked(result[0].content)
@@ -163,29 +141,27 @@ const post_comment_show_get = function (req, res, next) {
         result[0].comment_detail.forEach(element => {
             element.created_time = formatDate(element.created_time)
         })
+
+        finResult = result[0]
+
+        let updateV = {}
+        updateV.views = result[0].views + 1
+        return Post.findOneAndUpdate(
+        {
+            _id: Oid,
+        },
+        {
+            $set: updateV
+        })
+    })
+    .then(function (data) {
         res.render('topic/show.html', {
             user: req.session.user,
-            result: result[0],
+            result: finResult,
             post: req.session.post
         })
     })
-
-    //进来先清空文章的session
-    // req.session.post=''
-    // console.log(req.query.id)
-    // Post.findById(req.query.id, function (err, post) {
-    //   if (err) {
-    //     return next(err)
-    //   }
-
-    //   // req.session.post=post
-
-    //   // posthtml=marked(post.content)
-    //   // res.render('topic/show.html', {
-    //   //   user:req.session.user,
-    //   //   post:posthtml
-    //   // })
-    // })
+    .catch(err => next(err))
     
 }
 
