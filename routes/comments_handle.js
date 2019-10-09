@@ -6,7 +6,7 @@ const post_comment_post = function (req, res, next) {
     if (!req.session.user)
         return res.redirect('/login')
     //1.获取表单数据
-    //2.处理表单数据，更改修改时间
+    //2.处理表单数据，
     //3.根据body更新数据库
     //4. 发送响应数据
     let postId = req.session.post

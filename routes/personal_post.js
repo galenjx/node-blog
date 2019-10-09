@@ -112,8 +112,7 @@ const post_new_post = function (req, res, next) {
     if (!req.session.user)
         return res.redirect('/login')
     //1.获取表单数据
-    //2.处理表单数据，更改修改时间
-    //3.根据body更新数据库
+    //2.处理表单数据，
     //4. 发送响应数据
     let user = req.session.user
     let body = req.body
@@ -142,8 +141,9 @@ const post_new_post = function (req, res, next) {
 const posts_delete_post = function (req, res, next) {
     if (!req.session.user)
         return res.redirect('/login')
-
-    let id = req.query.id.replace(/"/g, '')
+        console.log(req)
+    let id = req.body.id.replace(/"/g, '')
+    
     let Oid = mongoose.Types.ObjectId(id);
     let user = req.session.user
     // id = user._id
@@ -155,7 +155,10 @@ const posts_delete_post = function (req, res, next) {
         if (err) {
             return next(err)
         }
-        res.redirect('/settings/edit_post_list')
+        res.status(200).json({
+            err_code: 0,
+            message: 'OK'
+        })
     })
 }
 
@@ -169,8 +172,10 @@ const post_edit_get = function (req, res, next) {
 
     let id = req.query.id.replace(/"/g, '')
     let Oid = mongoose.Types.ObjectId(id);
+    let user = req.session.user
     Post.findOne({
-        _id: Oid
+        _id: Oid,
+        author_id: user._id
     }, function (err, result) {
         if (err) {
             // 交给处理错误的中间件

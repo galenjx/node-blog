@@ -1,12 +1,14 @@
 
-function post_ajax(formId, url, successCallback, advanceCallback) {
+function post_ajax(formId, url, type, successCallback, advanceCallback) {
   $(formId).on('submit', function (e) {
-    advanceCallback && advanceCallback()
     e.preventDefault()
+    if(advanceCallback && !advanceCallback())
+    return window.alert('已停止操作')
     var formData = $(this).serialize()
+    console.log(formData)
      $.ajax({
       url: url,
-      type: 'post',
+      type: type,
       data: formData,
       dataType: 'json',
       success: function (data) {

@@ -50,7 +50,7 @@ router.get('/topic/edit', personal_post.post_edit_get)
 //更改文章
 router.post('/topic/edit', personal_post.post_edit_post)
 //删除私人文章
-router.get('/posts_delete_post', personal_post.posts_delete_post)
+router.post('/posts_delete_post', personal_post.posts_delete_post)
 //+=====================================comments_handle===========================================
 
 router.post('/posts/comment', comments_handle.post_comment_post)
